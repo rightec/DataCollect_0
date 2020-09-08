@@ -10,7 +10,15 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
+
+    for (int iRowIndex = 0;iRowIndex< MAINW_NUMROW;iRowIndex++){
+        for (int iColIndex = 0; iColIndex<MAINW_NUMCOL; iColIndex++){
+             qDebug() << "Value:" << labelNameArray[iRowIndex][iColIndex];
+        }
+    }
+
     startSetUp();
 
 }
@@ -33,13 +41,23 @@ bool MainWindow::buildFrameStruct()
        for (iColIndex = 0; iColIndex<MAINW_NUMCOL; iColIndex++){
            framArray[iRowIndex][iColIndex] = new (QFrame);
            ui->gLayMainForm->addWidget(framArray[iRowIndex][iColIndex], iRowIndex, iColIndex);
-            qDebug() << "Item:" << iRowIndex << iColIndex;
+           // qDebug() << "Item:" << iRowIndex << iColIndex;
            bRetVal = setSingleFrame(framArray[iRowIndex][iColIndex]);
            if (bRetVal == false){
                //Force the break of both for cycle
                iColIndex = MAINW_NUMCOL;
                iRowIndex = MAINW_NUMROW;
-           }//else
+           }else{
+               vBoxLayoutArray[iRowIndex][iColIndex] = new (QVBoxLayout);
+               bRetVal = setSingleVLayout(vBoxLayoutArray[iRowIndex][iColIndex], iRowIndex,iColIndex);
+               if (bRetVal == false){
+                   //Force the break of both for cycle
+                   iColIndex = MAINW_NUMCOL;
+                   iRowIndex = MAINW_NUMROW;
+               }else{
+                   framArray[iRowIndex][iColIndex]->setLayout(vBoxLayoutArray[iRowIndex][iColIndex]);
+               }
+           }
        }//end for column cycle
    }//end for row cycle
 
@@ -60,6 +78,64 @@ bool MainWindow::setSingleFrame(QFrame *frameToSet)
    }
 
    return bRetVal;
+}
+
+bool MainWindow::setSingleVLayout(QVBoxLayout *vBoxLayoutToSet,int row, int col)
+{
+    bool bRetVal = false;
+
+    if (vBoxLayoutToSet != nullptr){
+        labelArray[row][col] = new (QLabel);
+        bRetVal = setSingleLabel(labelArray[row][col]);
+        if (bRetVal == true){
+            vBoxLayoutToSet->addWidget(labelArray[row][col]);
+            textEditArray[row][col] = new (QPlainTextEdit);
+            bRetVal = setSinglePlainText(textEditArray[row][col]);
+            if (bRetVal == true){
+                vBoxLayoutToSet->addWidget(textEditArray[row][col]);
+            }//else
+        }//else
+    }else{
+        bRetVal = false;
+    }
+
+    return bRetVal;
+
+}
+
+bool MainWindow::setSingleLabel(QLabel *labelToSet)
+{
+    bool bRetVal = false;
+
+    if (labelToSet != nullptr){
+        labelToSet->setText("Ciccio");
+        labelToSet->setFrameShape(QFrame::Box);
+        labelToSet->setLineWidth(MAINW_FRAMELW);
+        labelToSet->setAlignment(Qt::AlignCenter);
+        bRetVal = true;
+    }else{
+        bRetVal = false;
+    }
+
+    return bRetVal;
+
+}
+
+bool MainWindow::setSinglePlainText(QPlainTextEdit *plainTextToSet)
+{
+    bool bRetVal = false;
+
+    if (plainTextToSet != nullptr){
+        plainTextToSet->setPlainText("Pasticcio");
+        plainTextToSet->setFrameShape(QFrame::Box);
+        plainTextToSet->setLineWidth(MAINW_FRAMELW);
+        bRetVal = true;
+    }else{
+        bRetVal = false;
+    }
+
+    return bRetVal;
+
 }
 
 MainWindow::~MainWindow()
